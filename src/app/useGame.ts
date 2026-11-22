@@ -1,14 +1,24 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import { idleSession } from "../shared/initial";
 import { gameReducer } from "./gameReducer";
+import { recoverDocument } from "../features/challenges";
 import { loadGame, saveGame } from "./storage";
 export function useGame() {
   const loaded = useRef<ReturnType<typeof loadGame> | null>(null);
   if (!loaded.current) loaded.current = loadGame();
-  const [state, send] = useReducer(gameReducer, loaded.current, (initial) => ({
-    ...initial,
-    session: idleSession(),
-  }));
+  const [state, send] = useReducer(gameReducer, loaded.current, (initial) => {
+    // Root contracts open at the document boundary; an interrupted cast from a
+    // previous session advances the order once before the UI appears.
+    const doc = recoverDocument(initial.doc);
+    return {
+      ...initial,
+      doc,
+      notice: doc.notes.length
+        ? doc.notes[doc.notes.length - 1]
+        : initial.notice,
+      session: idleSession(),
+    };
+  });
   const recovery = useRef(loaded.current.recovery === true);
   const [saved, setSaved] = useState(!recovery.current);
   useEffect(() => {

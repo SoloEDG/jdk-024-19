@@ -1,7 +1,7 @@
 import type { GameDocument, Session } from "./types";
 export function newDocument(): GameDocument {
   return {
-    version: 1,
+    version: 2,
     spot: "reed",
     bait: "worm",
     power: 0.6,
@@ -12,6 +12,11 @@ export function newDocument(): GameDocument {
     journal: {},
     stats: { casts: 0, catches: 0, escapes: 0, released: 0 },
     claimed: [],
+    seq: 0,
+    cast: 0,
+    pending: null,
+    ledger: { events: [], trim: null, stages: {} },
+    notes: [],
   };
 }
 export function idleSession(): Session {

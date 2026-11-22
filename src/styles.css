@@ -1565,3 +1565,248 @@ main {
     animation: notice-out 1ms 5s forwards !important;
   }
 }
+
+/* ---- contract panel (JDK-024 contract ledger) ---- */
+.challenge-panel .contract-count {
+  margin-left: auto;
+  font-size: 9px;
+  color: #8b9d9e;
+  white-space: nowrap;
+}
+.contract-combo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #e9f1e6;
+  border: 1px solid #cfdcc8;
+  border-radius: 6px;
+  padding: 9px 10px;
+  margin-top: 14px;
+  font-size: 9px;
+  line-height: 1.6;
+  color: #52744f;
+}
+.contract-combo svg {
+  flex-shrink: 0;
+  color: #6d9064;
+}
+.contract-combo span {
+  flex: 1;
+}
+.contract-item {
+  border-top: 1px solid #e3eae3;
+  padding-top: 14px;
+}
+.contract-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.contract-head {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 11px;
+  background: none;
+  text-align: left;
+  padding: 0;
+}
+.contract-head > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.contract-head strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+}
+.contract-head small {
+  display: block;
+  font-size: 8px;
+  color: #93a191;
+  margin-top: 5px;
+  line-height: 1.5;
+}
+.contract-item.status-claimed .challenge-stamp {
+  color: #ab8552;
+  background: #eee5cf;
+}
+.contract-item.status-expired .challenge-stamp {
+  color: #b07a63;
+  background: #f0e3da;
+}
+.contract-item.status-abandoned .challenge-stamp {
+  color: #a0a49c;
+  background: #e9ebe6;
+}
+.contract-body {
+  padding: 10px 0 0 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.contract-brief {
+  font-size: 9px;
+  line-height: 1.7;
+  color: #7d8f86;
+}
+.route-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.route-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 8px;
+  color: #9aa68e;
+}
+.route-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #f6f9f4;
+  border: 1px solid #e4ebe0;
+  border-radius: 5px;
+  padding: 8px 9px;
+}
+.route-row > div {
+  flex: 1;
+  min-width: 0;
+}
+.route-row.ready {
+  border-color: #b9cdaa;
+  background: #eef5e9;
+}
+.route-row.claimed {
+  border-color: #d9c99f;
+  background: #f6f0df;
+}
+.route-row strong {
+  font-size: 9px;
+  font-weight: 600;
+}
+.route-row small {
+  display: block;
+  font-size: 7px;
+  color: #9aa68e;
+  margin-top: 2px;
+}
+.route-row em {
+  display: block;
+  font-style: normal;
+  font-size: 7px;
+  color: #7f9384;
+  margin-top: 5px;
+}
+.route-steps {
+  margin: 6px 0 0;
+  padding-left: 14px;
+  font-size: 8px;
+  line-height: 1.8;
+  color: #73877a;
+}
+.window-list,
+.failure-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.window-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 8px;
+  letter-spacing: 0.4px;
+  color: #6d8b74;
+}
+.window-row {
+  background: #f1f6ef;
+  border-left: 2px solid #9cb98e;
+  border-radius: 3px;
+  padding: 6px 8px;
+}
+.window-row span {
+  display: block;
+  font-size: 8px;
+  font-weight: 600;
+  color: #5c7a5e;
+}
+.window-row small {
+  display: block;
+  font-size: 7px;
+  color: #859783;
+  line-height: 1.6;
+  margin-top: 3px;
+}
+.window-row em,
+.failure-row em {
+  display: block;
+  font-style: normal;
+  font-size: 7px;
+  color: #9aa68e;
+  margin-top: 4px;
+  letter-spacing: 0.3px;
+}
+.failure-row {
+  background: #f8f2ee;
+  border-left: 2px solid #d2a58f;
+  border-radius: 3px;
+  padding: 6px 8px;
+}
+.failure-row small {
+  display: block;
+  font-size: 7px;
+  line-height: 1.7;
+  color: #8d7a70;
+}
+.contract-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.contract-actions .text-btn {
+  font-size: 8px;
+  color: #7b9083;
+}
+.combo-mark {
+  font-size: 7px;
+  color: #6d9064;
+  background: #eaf1e4;
+  border-radius: 3px;
+  padding: 4px 7px;
+  display: inline-block;
+}
+.conflict-mark {
+  font-size: 7px;
+  color: #9c7b62;
+  background: #f6efe6;
+  border-radius: 3px;
+  padding: 4px 7px;
+  display: inline-block;
+  line-height: 1.6;
+}
+.abandoned-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 7px;
+  line-height: 1.7;
+  color: #9a8a7c;
+  background: #f5f2ed;
+  border-radius: 3px;
+  padding: 6px 8px;
+}
+.contract-foot {
+  font-size: 7px;
+  line-height: 1.8;
+  color: #a0ad9e;
+  padding-top: 4px;
+  border-top: 1px dashed #e2e9df;
+  margin-top: 14px;
+}
+@media (max-width: 640px) {
+  .contract-body {
+    padding-left: 0;
+  }
+}

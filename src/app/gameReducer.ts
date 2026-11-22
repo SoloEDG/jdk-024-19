@@ -12,8 +12,28 @@ import {
 } from "../features/tackle";
 import { prepareCast, tickSession, strike } from "../features/fishing";
 import { landCatch, releaseCatch } from "../features/collection";
-import { claimReward } from "../features/challenges";
+import {
+  beginCast,
+  claimCombo,
+  claimPlan,
+  record,
+  retryStage,
+  settlePending,
+  switchRoute,
+  trimLedger,
+} from "../features/challenges";
+
 export function gameReducer(state: Workspace, c: Command): Workspace {
+  const next = reduce(state, c);
+  // A refusal explains itself once: surface only a newly appended note.
+  // Notes are capped at 3, so compare the tail text rather than the length.
+  const before = state.doc.notes[state.doc.notes.length - 1];
+  const after = next.doc.notes[next.doc.notes.length - 1];
+  if (after && after !== before) return { ...next, notice: after };
+  return next;
+}
+
+function reduce(state: Workspace, c: Command): Workspace {
   const { doc, session: s } = state;
   const busy = isBusy(s);
   switch (c.type) {
@@ -48,19 +68,29 @@ export function gameReducer(state: Workspace, c: Command): Workspace {
       if (s.phase !== "charging") return state;
       const consumed = consumeBait(doc);
       if (!consumed) return state;
+      const castNo = consumed.cast + 1;
       const cast = prepareCast(
-        doc,
+        consumed,
         s.charge,
-        attraction(doc.spot, doc.bait),
-        (r) => biteDelay(doc.bait, r),
+        attraction(consumed.spot, consumed.bait),
+        (r) => biteDelay(consumed.bait, r),
       );
       return {
         ...state,
-        doc: {
-          ...consumed,
-          seed: cast.seed,
-          stats: { ...doc.stats, casts: doc.stats.casts + 1 },
-        },
+        doc: beginCast(
+          {
+            ...consumed,
+            seed: cast.seed,
+            stats: { ...consumed.stats, casts: consumed.stats.casts + 1 },
+          },
+          {
+            cast: castNo,
+            catchId: cast.session.id,
+            fish: cast.session.fish,
+            spot: cast.session.spot,
+            bait: cast.session.bait,
+          },
+        ),
         session: cast.session,
       };
     }
@@ -73,23 +103,71 @@ export function gameReducer(state: Workspace, c: Command): Workspace {
     case "tick": {
       const next = tickSession(s, doc, Math.min(0.1, Math.max(0, c.dt)));
       if (next === s) return state;
-      let updated = doc;
-      if (next.phase === "landed" && s.phase !== "landed")
-        updated = landCatch(doc, next, Date.now());
-      if (next.phase === "escaped" && s.phase !== "escaped")
-        updated = {
-          ...doc,
-          stats: { ...doc.stats, escapes: doc.stats.escapes + 1 },
+      if (next.phase === "landed" && s.phase !== "landed") {
+        // The catch enters the bag first; the ledger then records the same
+        // fish under the same bag id, so a release can be matched to it.
+        const landed = landCatch(doc, next, Date.now());
+        return {
+          ...state,
+          doc: settlePending(landed, {
+            source: "land",
+            catchId: next.id,
+            fish: next.fish,
+            spot: next.spot,
+            bait: next.bait,
+          }),
+          session: next,
         };
-      return { ...state, doc: updated, session: next };
+      }
+      if (next.phase === "escaped" && s.phase !== "escaped") {
+        return {
+          ...state,
+          doc: settlePending(
+            {
+              ...doc,
+              stats: { ...doc.stats, escapes: doc.stats.escapes + 1 },
+            },
+            {
+              source: "escape",
+              catchId: null,
+              fish: next.fish,
+              spot: next.spot,
+              bait: next.bait,
+            },
+          ),
+          session: next,
+        };
+      }
+      return { ...state, session: next };
     }
     case "next":
       return s.phase === "landed" || s.phase === "escaped"
-        ? { ...state, session: idleSession() }
+        ? { ...state, doc: trimLedger(doc), session: idleSession() }
         : state;
-    case "release":
-      return { ...state, doc: releaseCatch(doc, c.id) };
+    case "release": {
+      const item = doc.bag.find((b) => b.id === c.id);
+      if (!item) return state;
+      const released = releaseCatch(doc, c.id);
+      if (released === doc) return state;
+      return {
+        ...state,
+        doc: record(released, {
+          cast: released.cast,
+          source: "release",
+          catchId: item.id,
+          fish: item.fish,
+          spot: item.spot,
+          bait: item.bait,
+        }),
+      };
+    }
     case "claim":
-      return { ...state, doc: claimReward(doc, c.id) };
+      return busy ? state : { ...state, doc: claimPlan(doc, c.stage, c.id) };
+    case "claim-all":
+      return busy ? state : { ...state, doc: claimCombo(doc) };
+    case "retry":
+      return busy ? state : { ...state, doc: retryStage(doc, c.stage) };
+    case "switch":
+      return busy ? state : { ...state, doc: switchRoute(doc, c.stage) };
   }
 }

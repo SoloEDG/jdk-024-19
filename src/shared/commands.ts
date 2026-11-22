@@ -11,5 +11,8 @@ export type Command =
   | { type: "tick"; dt: number }
   | { type: "next" }
   | { type: "release"; id: string }
-  | { type: "claim"; id: string }
+  | { type: "claim"; stage: string; id: string }
+  | { type: "claim-all" }
+  | { type: "retry"; stage: string }
+  | { type: "switch"; stage: string }
   | { type: "resupply" };
